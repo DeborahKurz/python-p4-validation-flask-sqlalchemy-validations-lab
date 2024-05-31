@@ -43,7 +43,30 @@ class Post(db.Model):
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     updated_at = db.Column(db.DateTime, onupdate=db.func.now())
 
-    # Add validators  
+    @validates('title')
+    def validate_title(self, key, title):
+        if len(title) < 1:
+            raise ValueError("Title must be at least 1 character long.") 
+        if "Won't Believe" not in title and "Secret" not in title and "Top" not in title and "Guess" not in title:
+            raise ValueError("Title must contain clickbait-y words from approved list.")
+        
+    @validates('content')
+    def validate_post(self, key, content):
+        if len(content) < 250:
+            raise ValueError("Post must be at least 250 characters long.")
+        return content
+        
+    @validates('summary')
+    def validate_summary(self, key, summary):
+        if len(summary) > 250:
+            raise ValueError("Post cannot be over 250 charcters long.")
+        return summary
+    
+    @validates('category')
+    def validate_category(self, key, category):
+        if category != "Fiction" and category != "Non-Fiction":
+            raise ValueError("Category must be Fiction or Non-Fiction")
+        return category
 
 
     def __repr__(self):
